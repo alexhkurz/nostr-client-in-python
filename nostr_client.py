@@ -4,8 +4,16 @@ import websockets
 import json
 
 class NostrClient:
-    def __init__(self, relay_url):
-        self.relay_url = relay_url
+    def __init__(self, url):
+        self.url = url
+        self.potential_relays = [
+            "wss://relay.damus.io",
+            "wss://relay.nostr.bg",
+            "wss://nostr-pub.wellorder.net",
+            "wss://relay.nostr.info"
+            # Add any other relays you want to check
+        ]
+        self.relay_url = url
 
     async def connect(self):
         try:
@@ -23,6 +31,16 @@ class NostrClient:
             "content": message
         }
         await websocket.send(json.dumps(event))
+
+    async def check_relay(self, relay):
+        # Implement the logic to check if a relay is alive
+        # For example:
+        try:
+            # Attempt to connect to the relay
+            # Return True if successful, False otherwise
+            pass
+        except Exception:
+            return False
 
     async def fetch_relays(self) -> List[str]:
         # This list could come from a config file or external source
@@ -46,18 +64,20 @@ class NostrClient:
         return self.relays
 
 async def main():
-    client = NostrClient()
+    # Initialize with a dummy URL, we'll update it later
+    client = NostrClient("dummy_url")
     print("Checking relays...")
     alive_relays = await client.fetch_relays()
     print(f"\nSummary:")
-    print(f"Total relays checked: {len(potential_relays)}")
+    print(f"Total relays checked: {len(client.potential_relays)}")
     print(f"Alive relays: {len(alive_relays)}")
-    print(f"Dead relays: {len(potential_relays) - len(alive_relays)}")
+    print(f"Dead relays: {len(client.potential_relays) - len(alive_relays)}")
     
     # Attempt to connect to the first alive relay
     if alive_relays:
         print(f"\nAttempting to connect to: {alive_relays[0]}")
-        await client.connect(alive_relays[0])
+        client.relay_url = alive_relays[0]  # Update the relay_url
+        await client.connect()
     else:
         print("\nNo alive relays found.")
 
