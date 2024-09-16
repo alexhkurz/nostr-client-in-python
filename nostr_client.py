@@ -7,10 +7,13 @@ class NostrClient:
         self.relay_url = relay_url
 
     async def connect(self):
-        async with websockets.connect(self.relay_url) as websocket:
-            await self.send_message(websocket, "Hello, Nostr!")
-            response = await websocket.recv()
-            print(f"Received: {response}")
+        try:
+            async with websockets.connect(self.relay_url) as websocket:
+                await self.send_message(websocket, "Hello, Nostr!")
+                response = await websocket.recv()
+                print(f"Received: {response}")
+        except Exception as e:
+            print(f"Failed to connect to {self.relay_url}: {e}")
 
     async def send_message(self, websocket, message):
         event = {
