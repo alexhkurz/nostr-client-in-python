@@ -2,6 +2,8 @@ from typing import List
 import asyncio
 import websockets
 import json
+import time
+import uuid
 
 class NostrClient:
     def __init__(self, url):
@@ -18,9 +20,21 @@ class NostrClient:
     async def connect(self):
         try:
             async with websockets.connect(self.relay_url) as websocket:
-                await self.send_message(websocket, "Hello, Nostr!")
-                response = await websocket.recv()
-                print(f"Received: {response}")
+                # Send a request for the most recent event
+                request_id = str(uuid.uuid4())
+                request = ["REQ", request_id, {"kinds": [1], "limit": 1}]
+                await websocket.send(json.dumps(request))
+                print(f"Sent: {json.dumps(request)}")
+
+                # Wait for and print responses
+                while True:
+                    response = await websocket.recv()
+                    print(f"Received: {response}")
+                    
+                    # If we receive an EOSE (End of Stored Events), we can stop listening
+                    if response.startswith('["EOSE",'):
+                        break
+
         except Exception as e:
             print(f"Failed to connect to {self.relay_url}: {e}")
             print("Please check if the relay URL is correct and reachable.")
