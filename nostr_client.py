@@ -33,12 +33,12 @@ class NostrClient:
         await websocket.send(json.dumps(event))
 
     async def check_relay(self, relay):
-        # Implement the logic to check if a relay is alive
-        # For example:
         try:
-            # Attempt to connect to the relay
-            # Return True if successful, False otherwise
-            pass
+            async with asyncio.timeout(5):  # 5 second timeout
+                async with websockets.connect(relay) as ws:
+                    await ws.send('["REQ", "test", {"kinds":[0],"limit":1}]')
+                    response = await ws.recv()
+                    return "EOSE" in response or "EVENT" in response
         except Exception:
             return False
 
