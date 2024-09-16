@@ -22,7 +22,21 @@ class NostrClient:
         }
         await websocket.send(json.dumps(event))
 
-if __name__ == "__main__":
-    relay_url = "wss://relay.example.com"
-    client = NostrClient(relay_url)
-    asyncio.run(client.connect())
+    async def fetch_relays(self):
+        # In a real-world scenario, this list might be fetched from a trusted source or configuration file.
+        return [
+            "wss://relay.example.com",
+            "wss://another-relay.example.com"
+        ]
+    async def main():
+        client = NostrClient("")
+        relays = await client.fetch_relays()
+        for relay in relays:
+            client.relay_url = relay
+            try:
+                await client.connect()
+                break  # Stop after the first successful connection
+            except Exception as e:
+                print(f"Failed to connect to {relay}: {e}")
+
+    asyncio.run(main())
