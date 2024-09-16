@@ -4,6 +4,7 @@ import websockets
 import json
 import time
 import uuid
+import base64
 
 class NostrClient:
     def __init__(self, url):
@@ -26,14 +27,31 @@ class NostrClient:
                 await websocket.send(json.dumps(request))
                 print(f"Sent: {json.dumps(request)}")
 
-                # Wait for and print responses
+                full_event = None
                 while True:
                     response = await websocket.recv()
-                    print(f"Received: {response}")
-                    
-                    # If we receive an EOSE (End of Stored Events), we can stop listening
-                    if response.startswith('["EOSE",'):
+                    print(f"Received: {response[:100]}...")  # Print first 100 chars
+
+                    if response.startswith('["EVENT",'):
+                        event_data = json.loads(response)
+                        if full_event is None:
+                            full_event = event_data
+                        else:
+                            full_event[2]['content'] += event_data[2]['content']
+                    elif response.startswith('["EOSE",'):
                         break
+
+                if full_event:
+                    print("\nReassembled event:")
+                    event_content = full_event[2]['content']
+                    try:
+                        decoded_content = base64.b64decode(event_content.split('://', 1)[1]).decode('utf-8')
+                        print(f"Decoded content: {decoded_content}")
+                    except:
+                        print(f"Raw content: {event_content}")
+                    print(f"Event ID: {full_event[2]['id']}")
+                    print(f"Event kind: {full_event[2]['kind']}")
+                    print(f"Event pubkey: {full_event[2]['pubkey']}")
 
         except Exception as e:
             print(f"Failed to connect to {self.relay_url}: {e}")
