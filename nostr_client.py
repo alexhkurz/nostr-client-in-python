@@ -14,6 +14,7 @@ class NostrClient:
                 print(f"Received: {response}")
         except Exception as e:
             print(f"Failed to connect to {self.relay_url}: {e}")
+            print("Please check if the relay URL is correct and reachable.")
 
     async def send_message(self, websocket, message):
         event = {
