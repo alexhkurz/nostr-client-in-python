@@ -28,15 +28,16 @@ class NostrClient:
             "wss://relay.example.com",
             "wss://another-relay.example.com"
         ]
-    async def main():
-        client = NostrClient("")
-        relays = await client.fetch_relays()
-        for relay in relays:
-            client.relay_url = relay
-            try:
-                await client.connect()
-                break  # Stop after the first successful connection
-            except Exception as e:
-                print(f"Failed to connect to {relay}: {e}")
+async def main():
+    client = NostrClient("")
+    relays = await client.fetch_relays()
+    for relay in relays:
+        client.relay_url = relay
+        try:
+            await client.connect()
+            break  # Stop after the first successful connection
+        except Exception as e:
+            print(f"Failed to connect to {relay}: {e}")
 
+if __name__ == "__main__":
     asyncio.run(main())
