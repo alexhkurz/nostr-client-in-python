@@ -132,6 +132,7 @@ async def main():
     else:
         print("No alive relays found. Exiting.")
         return
+    while True:
         print("\nOptions:")
         print("1. Post a message")
         print("2. Read messages")
