@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import asyncio
+import click
 from nostr_client import NostrClient
 
 app = Flask(__name__)
@@ -36,4 +37,7 @@ async def read_messages_async():
     return []
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = 5000  # You can change this if needed
+    click.echo(f"\nServer starting. Click the link below to open the app:")
+    click.echo(click.style(f"http://127.0.0.1:{port}", underline=True, fg="cyan"))
+    app.run(debug=True, port=port)
