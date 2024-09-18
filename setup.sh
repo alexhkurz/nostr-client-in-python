@@ -1,30 +1,21 @@
 #!/bin/bash
 
-# Remove any existing virtual environment
+# Deactivate any number of nested virtual environments
+while [ -n "$VIRTUAL_ENV" ]; do
+    deactivate
+done
+
+# Remove existing venv if it exists
 if [ -d "venv" ]; then
     rm -rf venv
 fi
 
-# Create a new virtual environment named 'venv'
+# Create and activate a new virtual environment
 python3 -m venv venv
-
-# Activate the virtual environment
 source venv/bin/activate
-
-# Ensure the virtual environment is activated
-if [[ "$VIRTUAL_ENV" == "" ]]; then
-    echo "Virtual environment not activated. Exiting."
-    exit 1
-fi
 
 # Upgrade pip and install the required packages
 pip install --upgrade pip
-pip install nostr websockets colorama
-
-# Debugging: Check if nostr is installed
-
-echo "Virtual environment setup complete. 'nostr' module installed."
-
-#pip show nostr
-#pip show websockets
+pip install nostr websockets asyncio colorama
+pip install flask
 
