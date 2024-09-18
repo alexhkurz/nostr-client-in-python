@@ -80,7 +80,10 @@ class NostrClient:
 
                 if response.startswith('["EVENT",'):
                     event_data = json.loads(response)
-                    messages.append(event_data[2]['content'])
+                    messages.append({
+                        'content': event_data[2]['content'],
+                        'pubkey': event_data[2]['pubkey']
+                    })
                 elif response.startswith('["EOSE",'):
                     break
 
