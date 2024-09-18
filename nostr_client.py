@@ -57,12 +57,34 @@ class NostrClient:
             print(f"Failed to connect to {self.relay_url}: {e}")
             print("Please check if the relay URL is correct and reachable.")
 
-    async def send_message(self, websocket, message):
-        event = {
-            "type": "EVENT",
-            "content": message
-        }
-        await websocket.send(json.dumps(event))
+    async def send_message(self, message):
+        async with websockets.connect(self.relay_url) as websocket:
+            event = {
+                "type": "EVENT",
+                "content": message
+            }
+            await websocket.send(json.dumps(event))
+            print(f"Message sent: {message}")
+
+    async def read_messages(self):
+        async with websockets.connect(self.relay_url) as websocket:
+            request_id = str(uuid.uuid4())
+            request = ["REQ", request_id, {"kinds": [1], "limit": 10}]
+            await websocket.send(json.dumps(request))
+            print(f"Sent: {json.dumps(request)}")
+
+            messages = []
+            while True:
+                response = await websocket.recv()
+                print(f"Received: {response[:100]}...")  # Print first 100 chars
+
+                if response.startswith('["EVENT",'):
+                    event_data = json.loads(response)
+                    messages.append(event_data[2]['content'])
+                elif response.startswith('["EOSE",'):
+                    break
+
+            return messages
 
     async def check_relay(self, relay):
         try:
@@ -105,13 +127,25 @@ async def main():
     print(f"Alive relays: {len(alive_relays)}")
     print(f"Dead relays: {len(client.potential_relays) - len(alive_relays)}")
     
-    # Attempt to connect to the first alive relay
-    if alive_relays:
-        print(f"\nAttempting to connect to: {alive_relays[0]}")
-        client.relay_url = alive_relays[0]  # Update the relay_url
-        await client.connect()
-    else:
-        print("\nNo alive relays found.")
+    while True:
+        print("\nOptions:")
+        print("1. Post a message")
+        print("2. Read messages")
+        print("3. Exit")
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            message = input("Enter your message: ")
+            await client.send_message(message)
+        elif choice == "2":
+            messages = await client.read_messages()
+            print("\nMessages:")
+            for msg in messages:
+                print(f"- {msg}")
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     asyncio.run(main())
