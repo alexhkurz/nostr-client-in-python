@@ -31,12 +31,12 @@ def read_messages():
     # Combine new messages with previously seen messages
     all_messages = seen_messages + messages
 
-    return render_template('messages.html', messages=all_messag        return render_template('messages.html', messages=all_messages)
+    return render_template('messages.html', messages=all_messages)
 
-    return render_template('messages.html', messages=all_messagdef convert_urls_to_links(text):
-    return render_template('messages.html', messages=all_messag    import re
-    return render_template('messages.html', messages=all_messag    url_pattern = re.compile(r'(https?://\S+)')
-    return render_template('messages.html', messages=all_messag    return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
+def convert_urls_to_links(text):
+    import re
+    url_pattern = re.compile(r'(https?://\S+)')
+    return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
 
 async def post_message_async(message):
     client = NostrClient("dummy_url")
