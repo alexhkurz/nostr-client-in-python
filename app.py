@@ -18,7 +18,20 @@ def post_message():
 @app.route('/read_messages')
 def read_messages():
     messages = asyncio.run(read_messages_async())
-    return render_template('messages.html', messages=messages)
+    # Read previously seen messages from the file
+    seen_messages = []
+    try:
+        with open('seen_messages.txt', 'r') as f:
+            for line in f:
+                pubkey, content = line.strip().split(': ', 1)
+                seen_messages.append({'pubkey': pubkey, 'content': content})
+    except FileNotFoundError:
+        pass
+
+    # Combine new messages with previously seen messages
+    all_messages = seen_messages + messages
+
+    return render_template('messages.html', messages=all_messages)
 
 async def post_message_async(message):
     client = NostrClient("dummy_url")
