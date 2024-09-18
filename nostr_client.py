@@ -127,7 +127,11 @@ async def main():
     print(f"Alive relays: {len(alive_relays)}")
     print(f"Dead relays: {len(client.potential_relays) - len(alive_relays)}")
     
-    while True:
+    if alive_relays:
+        client.relay_url = alive_relays[0]  # Update the relay_url to the first alive relay
+    else:
+        print("No alive relays found. Exiting.")
+        return
         print("\nOptions:")
         print("1. Post a message")
         print("2. Read messages")
