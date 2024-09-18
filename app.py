@@ -24,14 +24,19 @@ def read_messages():
         with open('seen_messages.txt', 'r') as f:
             for line in f:
                 pubkey, content = line.strip().split(': ', 1)
-                seen_messages.append({'pubkey': pubkey, 'content': content})
+                seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content)})
     except FileNotFoundError:
         pass
 
     # Combine new messages with previously seen messages
     all_messages = seen_messages + messages
 
-    return render_template('messages.html', messages=all_messages)
+    return render_template('messages.html', messages=all_messag        return render_template('messages.html', messages=all_messages)
+
+    return render_template('messages.html', messages=all_messagdef convert_urls_to_links(text):
+    return render_template('messages.html', messages=all_messag    import re
+    return render_template('messages.html', messages=all_messag    url_pattern = re.compile(r'(https?://\S+)')
+    return render_template('messages.html', messages=all_messag    return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
 
 async def post_message_async(message):
     client = NostrClient("dummy_url")

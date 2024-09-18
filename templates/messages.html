@@ -9,7 +9,7 @@
     <h1>Messages</h1>
     <ul>
         {% for message in messages %}
-            <li><strong>{{ message.pubkey }}:</strong> {{ message.content }}</li>
+            <li><strong>{{ message.pubkey }}:</strong> {{ message.content | safe }}</li>
         {% endfor %}
     </ul>
     <br>
