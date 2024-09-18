@@ -2,3 +2,5 @@
 .env
 load-env.py
 venv
+seen_messages.txt
+*.pyc
