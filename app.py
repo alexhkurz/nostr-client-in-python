@@ -44,7 +44,7 @@ def read_messages():
         # Combine new messages with previously seen messages
     all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url, 'created_at': unix_to_pst(int(msg.get('created_at', 'unknown'))) if msg.get('created_at', 'unknown') != 'unknown' else 'unknown'} for msg in messages]
 
-    return render_template('messages.html', messages=all_messages)
+    return render_template('messages.html', messages=all_messages[::-1])
 
 def convert_urls_to_links(text):
     import re
