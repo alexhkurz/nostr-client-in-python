@@ -30,7 +30,7 @@ def read_messages():
                 try:
                     pubkey, rest = line.strip().split(': ', 1)
                     content = rest
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url})
+                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': 'unknown'})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
@@ -41,7 +41,7 @@ def read_messages():
     if alive_relays:
         client.relay_url = alive_relays[0]
         # Combine new messages with previously seen messages
-    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url} for msg in messages]
+    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url, 'created_at': msg['created_at']} for msg in messages]
 
     return render_template('messages.html', messages=all_messages)
 
