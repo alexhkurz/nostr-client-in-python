@@ -91,7 +91,7 @@ class NostrClient:
                             'created_at': created_at
                         })
                     else:
-                        received_at = int(time.time())
+                        received_at = unix_to_pst(int(time.time()))
                         messages.append({
                             'content': event_data[2]['content'],
                             'pubkey': event_data[2]['pubkey'],
