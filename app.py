@@ -32,7 +32,11 @@ def read_messages():
     except FileNotFoundError:
         pass
 
-    # Combine new messages with previously seen messages
+    client = NostrClient()
+    alive_relays = asyncio.run(client.fetch_relays())
+    if alive_relays:
+        client.relay_url = alive_relays[0]
+        # Combine new messages with previously seen messages
     all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url} for msg in messages]
 
     return render_template('messages.html', messages=all_messages)
