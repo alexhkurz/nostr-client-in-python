@@ -20,3 +20,27 @@ To run it in a web browser, use
 python app.py
 ```
 
+## Background
+
+The Nostr protocol is described in [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md)
+
+## Specification
+
+`class NostrClient`
+
+> `self.potential_relays` is a list of potential relays to connect to.
+> 
+> `self.relay_url` is the URL of the relay we are currently connected to.
+
+> `fetch_relays()` attempts to connect to each relay in `self.potential_relays` and checks if the connection is successful.
+> 
+> `send_message(message)` sends `message` to the relay.
+> 
+> `read_messages()` reads messages from the relay.
+> 
+> `check_relay(url)` checks if the relay is alive by attempting to connect to it.
+> 
+> `connect()` attempts to connect to the relay for sending and receiving messages.
+
+
+
