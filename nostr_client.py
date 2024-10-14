@@ -87,10 +87,10 @@ class NostrClient:
                 elif response.startswith('["EOSE",'):
                     break
 
-            # Append new messages to a file
+            # Append new messages to a file without relay information
             with open('seen_messages.txt', 'a') as f:
                 for message in messages:
-                    f.write(f"{message['pubkey']}: {message['content']} (from {message['relay']})\n")
+                    f.write(f"{message['pubkey']}: {message['content']}\n")
 
             return messages
 

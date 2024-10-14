@@ -25,16 +25,15 @@ def read_messages():
             for line in f:
                 try:
                     pubkey, rest = line.strip().split(': ', 1)
-                    content, relay = rest.rsplit(' (from ', 1)
-                    relay = relay.rstrip(')')
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': relay})
+                    content = rest
+                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': 'unknown'})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
         pass
 
     # Combine new messages with previously seen messages
-    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': msg['relay']} for msg in messages]
+    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url} for msg in messages]
 
     return render_template('messages.html', messages=all_messages)
 
