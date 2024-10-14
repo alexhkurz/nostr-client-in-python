@@ -17,6 +17,10 @@ def post_message():
 
 @app.route('/read_messages')
 def read_messages():
+    client = NostrClient()
+    alive_relays = asyncio.run(client.fetch_relays())
+    if alive_relays:
+        client.relay_url = alive_relays[0]
     messages = asyncio.run(read_messages_async())
     # Read previously seen messages from the file
     seen_messages = []
