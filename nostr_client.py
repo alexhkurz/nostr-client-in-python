@@ -81,11 +81,12 @@ class NostrClient:
 
                 if response.startswith('["EVENT",'):
                     event_data = json.loads(response)
+                    created_at = event_data[2].get('created_at', int(time.time()))
                     messages.append({
                         'content': event_data[2]['content'],
                         'pubkey': event_data[2]['pubkey'],
                         'relay': self.relay_url,
-                        'created_at': event_data[2].get('created_at', 'unknown')
+                        'created_at': created_at
                     })
                 elif response.startswith('["EOSE",'):
                     break
