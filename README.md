@@ -42,5 +42,5 @@ The Nostr protocol is described in [NIP-01](https://github.com/nostr-protocol/ni
 > 
 > `connect()` attempts to connect to the relay for sending and receiving messages.
 
-
+`app.py` that provides a web interface to the Nostr client.
 
