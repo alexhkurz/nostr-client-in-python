@@ -26,7 +26,7 @@ The Nostr protocol is described in [NIP-01](https://github.com/nostr-protocol/ni
 
 ## Specification
 
-`class NostrClient`
+`class NostrClient:`
 
 > `self.potential_relays` is a list of potential relays to connect to.
 > 
@@ -38,7 +38,7 @@ The Nostr protocol is described in [NIP-01](https://github.com/nostr-protocol/ni
 > 
 > `read_messages()` reads messages from the relay.
 > 
-> `check_relay(url)` checks if the relay is alive by attempting to connect to it.
+> `check_relay(url)` checks if the url is alive by attempting to connect to it.
 > 
 > `connect()` attempts to connect to the relay for sending and receiving messages.
 
