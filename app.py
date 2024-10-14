@@ -31,7 +31,10 @@ def read_messages():
                     pubkey, rest = line.strip().split(': ', 1)
                     content, created_at = rest.rsplit(' (created_at: ', 1)
                     created_at = created_at.rstrip(')')
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': unix_to_pst(int(created_at)) if created_at != 'unknown' else 'unknown'})
+                    if 'created_at' in rest:
+                        seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': unix_to_pst(int(created_at))})
+                    else:
+                        seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'received_at': unix_to_pst(int(time.time()))})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
@@ -42,7 +45,15 @@ def read_messages():
     if alive_relays:
         client.relay_url = alive_relays[0]
         # Combine new messages with previously seen messages
-    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url, 'created_at': unix_to_pst(int(msg.get('created_at', 'unknown'))) if msg.get('created_at', 'unknown') != 'unknown' else 'unknown'} for msg in messages]
+    all_messages = seen_messages + [
+        {
+            'pubkey': msg['pubkey'],
+            'content': convert_urls_to_links(msg['content']),
+            'relay': client.relay_url,
+            'created_at': unix_to_pst(int(msg['created_at'])) if 'created_at' in msg else None,
+            'received_at': unix_to_pst(int(msg['received_at'])) if 'received_at' in msg else None
+        } for msg in messages
+    ]
 
     return render_template('messages.html', messages=all_messages[::-1])
 
