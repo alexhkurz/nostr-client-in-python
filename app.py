@@ -42,14 +42,14 @@ def convert_urls_to_links(text):
     return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
 
 async def post_message_async(message):
-    client = NostrClient("dummy_url")
+    client = NostrClient()
     alive_relays = await client.fetch_relays()
     if alive_relays:
         client.relay_url = alive_relays[0]
         await client.send_message(message)
 
 async def read_messages_async():
-    client = NostrClient("dummy_url")
+    client = NostrClient()
     alive_relays = await client.fetch_relays()
     if alive_relays:
         client.relay_url = alive_relays[0]
