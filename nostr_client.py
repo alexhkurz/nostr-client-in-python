@@ -133,6 +133,8 @@ def unix_to_pst(unix_time):
     utc_time = utc_time.replace(tzinfo=pytz.utc)
     pst_time = utc_time.astimezone(pytz.timezone('America/Los_Angeles'))
     return pst_time.strftime('%Y-%m-%d %H:%M:%S %Z')
+
+async def main():
     client = NostrClient()
     print("Checking relays...")
     alive_relays = await client.fetch_relays()
