@@ -90,7 +90,7 @@ class NostrClient:
             # Append new messages to a file
             with open('seen_messages.txt', 'a') as f:
                 for message in messages:
-                    f.write(f"{message['pubkey']}: {message['content']}\n")
+                    f.write(f"{message['pubkey']}: {message['content']} (from {message['relay']})\n")
 
             return messages
 

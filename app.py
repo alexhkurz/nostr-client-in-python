@@ -24,8 +24,10 @@ def read_messages():
         with open('seen_messages.txt', 'r') as f:
             for line in f:
                 try:
-                    pubkey, content = line.strip().split(': ', 1)
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': 'unknown'})
+                    pubkey, rest = line.strip().split(': ', 1)
+                    content, relay = rest.rsplit(' (from ', 1)
+                    relay = relay.rstrip(')')
+                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': relay})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
