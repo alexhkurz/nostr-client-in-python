@@ -5,6 +5,8 @@ import json
 import time
 import uuid
 import base64
+import datetime
+import pytz
 
 class NostrClient:
     def __init__(self):
@@ -126,7 +128,11 @@ class NostrClient:
         self.relays = alive_relays
         return self.relays
 
-async def main():
+def unix_to_pst(unix_time):
+    utc_time = datetime.datetime.utcfromtimestamp(unix_time)
+    utc_time = utc_time.replace(tzinfo=pytz.utc)
+    pst_time = utc_time.astimezone(pytz.timezone('America/Los_Angeles'))
+    return pst_time.strftime('%Y-%m-%d %H:%M:%S %Z')
     client = NostrClient()
     print("Checking relays...")
     alive_relays = await client.fetch_relays()

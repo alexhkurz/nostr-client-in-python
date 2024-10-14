@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 import asyncio
 import click
-from nostr_client import NostrClient
+from nostr_client import NostrClient, unix_to_pst
 
 app = Flask(__name__)
 
@@ -31,7 +31,7 @@ def read_messages():
                     pubkey, rest = line.strip().split(': ', 1)
                     content, created_at = rest.rsplit(' (created_at: ', 1)
                     created_at = created_at.rstrip(')')
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': created_at})
+                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': unix_to_pst(int(created_at)) if created_at != 'unknown' else 'unknown'})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
@@ -42,7 +42,7 @@ def read_messages():
     if alive_relays:
         client.relay_url = alive_relays[0]
         # Combine new messages with previously seen messages
-    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url, 'created_at': msg.get('created_at', 'unknown')} for msg in messages]
+    all_messages = seen_messages + [{'pubkey': msg['pubkey'], 'content': convert_urls_to_links(msg['content']), 'relay': client.relay_url, 'created_at': unix_to_pst(int(msg.get('created_at', 'unknown'))) if msg.get('created_at', 'unknown') != 'unknown' else 'unknown'} for msg in messages]
 
     return render_template('messages.html', messages=all_messages)
 
