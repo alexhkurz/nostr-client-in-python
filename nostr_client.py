@@ -7,8 +7,7 @@ import uuid
 import base64
 
 class NostrClient:
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
         self.potential_relays = [
             "wss://relay.damus.io",
             "wss://relay.nostr.bg",
@@ -16,7 +15,7 @@ class NostrClient:
             "wss://relay.nostr.info"
             # Add any other relays you want to check
         ]
-        self.relay_url = url
+        self.relay_url = "dummy_url" # Current relay URL
 
     async def connect(self):
         try:
@@ -126,8 +125,7 @@ class NostrClient:
         return self.relays
 
 async def main():
-    # Initialize with a dummy URL, we'll update it later
-    client = NostrClient("dummy_url")
+    client = NostrClient()
     print("Checking relays...")
     alive_relays = await client.fetch_relays()
     print(f"\nSummary:")
@@ -137,9 +135,11 @@ async def main():
     
     if alive_relays:
         client.relay_url = alive_relays[0]  # Update the relay_url to the first alive relay
+        print(f"Connected to relay: {client.relay_url}")  # Output the current relay URL
     else:
         print("No alive relays found. Exiting.")
         return
+
     while True:
         print("\nOptions:")
         print("1. Post a message")
