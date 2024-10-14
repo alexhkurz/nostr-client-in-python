@@ -81,7 +81,8 @@ class NostrClient:
                     event_data = json.loads(response)
                     messages.append({
                         'content': event_data[2]['content'],
-                        'pubkey': event_data[2]['pubkey']
+                        'pubkey': event_data[2]['pubkey'],
+                        'relay': self.relay_url
                     })
                 elif response.startswith('["EOSE",'):
                     break
