@@ -29,8 +29,9 @@ def read_messages():
             for line in f:
                 try:
                     pubkey, rest = line.strip().split(': ', 1)
-                    content = rest
-                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': 'unknown'})
+                    content, created_at = rest.rsplit(' (created_at: ', 1)
+                    created_at = created_at.rstrip(')')
+                    seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': created_at})
                 except ValueError:
                     print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
