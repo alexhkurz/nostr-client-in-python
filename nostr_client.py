@@ -7,17 +7,23 @@ import uuid
 import base64
 import datetime
 import pytz
+import hashlib
+import hmac
 
 class NostrClient:
-    def __init__(self):
-        self.potential_relays = [
-            "wss://relay.damus.io",
-            "wss://relay.nostr.bg",
-            "wss://nostr-pub.wellorder.net",
-            "wss://relay.nostr.info"
-            # Add any other relays you want to check
-        ]
-        self.relay_url = "dummy_url" # Current relay URL
+    def __init__(self, relay_url, private_key, public_key):
+        self.relay_url = relay_url
+        self.private_key = private_key
+        self.public_key = public_key
+
+    def sign_event(self, event):
+        # Create a deterministic JSON string of the event
+        event_json = json.dumps(event, separators=(',', ':'), sort_keys=True)
+        # Hash the event
+        event_hash = hashlib.sha256(event_json.encode()).hexdigest()
+        # Sign the hash with the private key (using HMAC for demonstration)
+        signature = hmac.new(self.private_key.encode(), event_hash.encode(), hashlib.sha256).hexdigest()
+        return signature
 
     async def connect(self):
         try:
@@ -59,13 +65,36 @@ class NostrClient:
             print("Please check if the relay URL is correct and reachable.")
 
     async def send_message(self, message):
-        async with websockets.connect(self.relay_url) as websocket:
-            event = {
-                "type": "EVENT",
-                "content": message
-            }
-            await websocket.send(json.dumps(event))
-            print(f"Message sent: {message}")
+        event = {
+            "id": "",  # Will be calculated
+            "pubkey": self.public_key,
+            "created_at": int(time.time()),
+            "kind": 1,  # Assuming '1' is a text note
+            "tags": [],
+            "content": message,
+            "sig": ""  # Will be calculated
+        }
+
+        # Calculate the event ID and signature
+        event['id'] = hashlib.sha256(json.dumps(event, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
+        event['sig'] = self.sign_event(event)
+
+        # Prepare the message according to NIP-01
+        message_array = ["EVENT", event]
+
+        try:
+            async with websockets.connect(self.relay_url) as websocket:
+                await websocket.send(json.dumps(message_array))
+                print(f"Message sent: {message}")
+
+                # Wait for acknowledgment
+                try:
+                    response = await websocket.recv()
+                    print(f"Server response: {response}")
+                except asyncio.TimeoutError:
+                    print("No acknowledgment received from server.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     async def read_messages(self):
         async with websockets.connect(self.relay_url) as websocket:
