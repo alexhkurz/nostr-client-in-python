@@ -15,6 +15,8 @@ class NostrClient:
     def __init__(self, relay_url, private_key, public_key):
         self.relay_url = relay_url
         self.private_key = private_key
+        if len(public_key) != 64:
+            raise ValueError("Invalid public key size. Expected 64-character hexadecimal string.")
         self.public_key = public_key
         self.potential_relays = [
             "wss://relay.damus.io",

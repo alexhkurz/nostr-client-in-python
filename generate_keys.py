@@ -8,8 +8,8 @@ def generate_key_pair():
     public_key = private_key.get_verifying_key()
 
     private_key_hex = private_key.to_string().hex()
-    # Get the compressed form of the public key
-    public_key_hex = public_key.to_string("compressed").hex()
+    # Get the uncompressed form of the public key and convert to 64-character hex
+    public_key_hex = public_key.to_string().hex()[:64]
 
     return private_key_hex, public_key_hex
 
