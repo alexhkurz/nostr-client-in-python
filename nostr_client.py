@@ -16,6 +16,13 @@ class NostrClient:
         self.relay_url = relay_url
         self.private_key = private_key
         self.public_key = public_key
+        self.potential_relays = [
+            "wss://relay.damus.io",
+            "wss://relay.nostr.bg",
+            "wss://nostr-pub.wellorder.net",
+            "wss://relay.nostr.info"
+            # Add any other relays you want to check
+        ]
 
     def sign_event(self, event):
         # Create a deterministic JSON string of the event
