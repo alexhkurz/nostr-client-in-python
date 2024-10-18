@@ -13,6 +13,7 @@ import hmac
 
 class NostrClient:
     def __init__(self, relay_url, private_key, public_key):
+        print(f"Loaded public key: {public_key} (length: {len(public_key)})")
         if len(public_key) != 64:
             raise ValueError("Invalid public key size. Expected 64-character hexadecimal string.")
         self.relay_url = relay_url
