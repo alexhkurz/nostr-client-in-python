@@ -1,5 +1,6 @@
 from typing import List
 import asyncio
+import json
 import websockets
 import json
 import time
@@ -175,7 +176,14 @@ def unix_to_pst(unix_time):
     return pst_time.strftime('%Y-%m-%d %H:%M:%S %Z')
 
 async def main():
-    client = NostrClient()
+    # Load keys from config.json
+    with open('config.json', 'r') as config_file:
+        config = json.load(config_file)
+    
+    private_key = config['private_key']
+    public_key = config['public_key']
+
+    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     print("Checking relays...")
     alive_relays = await client.fetch_relays()
     print(f"\nSummary:")
