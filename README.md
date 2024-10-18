@@ -10,6 +10,12 @@ WARNING: Work in progress. Simple web interface to send and read messages.
 source setup.sh
 ```
 
+To generate a new key pair, run
+```
+python generate_keys.py
+```
+The keys will be saved to `config.json`.
+
 To run the client from the command line, use
 ```
 python nostr_client.py

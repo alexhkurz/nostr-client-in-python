@@ -8,4 +8,4 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install nostr websockets asyncio colorama
 pip install flask
-
+pip install ecdsa
