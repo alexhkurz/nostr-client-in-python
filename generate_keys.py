@@ -7,7 +7,7 @@ def generate_key_pair():
     public_key = private_key.get_verifying_key()
 
     private_key_hex = private_key.to_string().hex()
-    public_key_hex = public_key.to_string().hex()
+    public_key_hex = public_key.to_string("compressed").hex()
 
     return private_key_hex, public_key_hex
 
