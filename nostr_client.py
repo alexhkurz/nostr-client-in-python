@@ -87,6 +87,7 @@ class NostrClient:
             "sig": ""  # Will be calculated
         }
 
+        print(f"Public key in event: {event['pubkey']} (length: {len(event['pubkey'])})")
         # Calculate the event ID and signature
         event['id'] = hashlib.sha256(json.dumps(event, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
         event['sig'] = self.sign_event(event)
@@ -195,6 +196,8 @@ async def main():
     public_key = config['public_key']
 
     print(f"Loaded public key: {public_key} (length: {len(public_key)})")
+    if len(public_key) != 66:
+        print("Warning: Public key length is not 66 characters. Please check the key format.")
     client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     print("Checking relays...")
     alive_relays = await client.fetch_relays()
