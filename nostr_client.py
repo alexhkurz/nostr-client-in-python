@@ -10,13 +10,15 @@ import datetime
 import pytz
 import hashlib
 import hmac
+from ecdsa import SigningKey, SECP256k1
+
+# Define the configuration file name as a constant
+CONFIG_FILE_NAME = 'config2.json'
 
 class NostrClient:
     def __init__(self, relay_url, private_key, public_key):
         self.relay_url = relay_url
         self.private_key = private_key
-        if len(public_key) != 64:
-            raise ValueError("Invalid public key size. Expected 64-character hexadecimal string.")
         self.public_key = public_key
         self.potential_relays = [
             "wss://relay.damus.io",
@@ -186,7 +188,7 @@ def unix_to_pst(unix_time):
 
 async def main():
     # Load keys from config.json
-    with open('config.json', 'r') as config_file:
+    with open(CONFIG_FILE_NAME, 'r') as config_file:
         config = json.load(config_file)
     
     private_key = config['private_key']
