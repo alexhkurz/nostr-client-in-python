@@ -88,6 +88,7 @@ class NostrClient:
         }
 
         print(f"Public key in event: {event['pubkey']} (length: {len(event['pubkey'])})")
+        print(f"Event data before sending: {json.dumps(event, indent=2)}")
         # Calculate the event ID and signature
         event['id'] = hashlib.sha256(json.dumps(event, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
         event['sig'] = self.sign_event(event)
