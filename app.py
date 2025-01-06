@@ -25,6 +25,8 @@ def read_messages():
             config = json.load(config_file)
             private_key = config['private_key']
             public_key = config['public_key']
+                except ValueError:
+                    print(f"Skipping malformed line: {line.strip()}")
     except FileNotFoundError:
         private_key, public_key = generate_key_pair()
         save_keys_to_config(private_key, public_key)
