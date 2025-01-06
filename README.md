@@ -52,16 +52,4 @@ python app.py
 
 `app.py` that provides a web interface to the Nostr client.
 
-## Known Issues
-
-The current problem is the reply "invalid: unexpected pubkey size":
-
-```bash
-> python nostr_client.py
-Loaded public key: 029ee99135e6a2edcd6ce8ae46b592931306e647507067cbccd09539cd88f3f785 (length: 66)
-Connected to relay: wss://relay.damus.io
-Enter your message: hi this is a test
-Server response: ["OK","5926e9247f9b1caf3738d081592fc12a0f0eebe039306010f5a5b49123f7a88c",false,"invalid: unexpected pubkey size"]
-```
-
 [^dsm]: I am interested in building and studying decentralized social media. Two much discussed decentralized social networks nowadays are Nostr and Bluesky. Nostr is the simplest one and, thus, would be a good start to "get our hands dirty" and gain some experience building. I think I mentioned Nostr before, did you have a chance to look at it?
