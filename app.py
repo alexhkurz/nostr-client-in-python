@@ -39,15 +39,23 @@ def read_messages():
         with open('seen_messages.txt', 'r') as f:
             for line in f:
                 try:
-                    pubkey, rest = line.strip().split(': ', 1)
-                    content, created_at = rest.rsplit(' (created_at: ', 1)
+                    parts = line.strip().split(': ', 1)
+                    if len(parts) != 2:
+                        print(f"Skipping malformed line: {line.strip()}")
+                        continue
+                    pubkey, rest = parts
+                    content_parts = rest.rsplit(' (created_at: ', 1)
+                    if len(content_parts) != 2:
+                        print(f"Skipping malformed line: {line.strip()}")
+                        continue
+                    content, created_at = content_parts
                     created_at = created_at.rstrip(')')
-                    if 'created_at' in rest:
-                        seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'created_at': unix_to_pst(int(created_at))})
-                    else:
-                        seen_messages.append({'pubkey': pubkey, 'content': convert_urls_to_links(content), 'relay': client.relay_url, 'received_at': unix_to_pst(int(time.time()))})
-                except ValueError:
-                    print(f"Skipping malformed line: {line.strip()}")
+                    seen_messages.append({
+                        'pubkey': pubkey,
+                        'content': convert_urls_to_links(content),
+                        'relay': client.relay_url,
+                        'created_at': unix_to_pst(int(created_at))
+                    })
     except FileNotFoundError:
         pass
 
