@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import asyncio
 import click
 from nostr_client import NostrClient, unix_to_pst
+from generate_keys import generate_key_pair, save_keys_to_config
 
 app = Flask(__name__)
 
@@ -18,7 +19,9 @@ def post_message():
 
 @app.route('/read_messages')
 def read_messages():
-    client = NostrClient()
+    private_key, public_key = generate_key_pair()
+    save_keys_to_config(private_key, public_key)
+    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = asyncio.run(client.fetch_relays())
     if alive_relays:
         client.relay_url = alive_relays[0]
@@ -41,7 +44,9 @@ def read_messages():
     except FileNotFoundError:
         pass
 
-    client = NostrClient()
+    private_key, public_key = generate_key_pair()
+    save_keys_to_config(private_key, public_key)
+    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = asyncio.run(client.fetch_relays())
     if alive_relays:
         client.relay_url = alive_relays[0]
@@ -64,7 +69,9 @@ def convert_urls_to_links(text):
     return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
 
 async def post_message_async(message):
-    client = NostrClient()
+    private_key, public_key = generate_key_pair()
+    save_keys_to_config(private_key, public_key)
+    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = await client.fetch_relays()
     if alive_relays:
         client.relay_url = alive_relays[0]
