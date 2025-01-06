@@ -12,6 +12,11 @@ import hashlib
 import hmac
 from ecdsa import SigningKey, SECP256k1
 from secp256k1 import PrivateKey
+import logging
+
+# Set up logging
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+logger = logging.getLogger('nostr')
 
 # Define the configuration file name as a constant
 CONFIG_FILE_NAME = 'config.json'
@@ -126,6 +131,7 @@ class NostrClient:
             print(f"An error occurred: {e}")
 
     async def read_messages(self):
+        logger.info("Fetching recent messages...")
         async with websockets.connect(self.relay_url) as websocket:
             request_id = str(uuid.uuid4())
             request = ["REQ", request_id, {"kinds": [1], "limit": 10}]

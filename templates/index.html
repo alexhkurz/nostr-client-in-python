@@ -4,15 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nostr Client</title>
+    <style>
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            border: 1px solid #ffa000;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: 1px solid #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border: 1px solid #218838;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: 1px solid #545b62;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border: 1px solid #138496;
+            color: white;
+            text-decoration: none;
+        }
+        .message-form {
+            margin-bottom: 20px;
+        }
+        .message-input {
+            padding: 8px;
+            margin-right: 10px;
+            width: 300px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Nostr Client</h1>
-    <form action="{{ url_for('post_message') }}" method="post">
-        <label for="message">Post a message:</label>
-        <input type="text" id="message" name="message" required>
-        <button type="submit">Post</button>
+    <h1>Nostr Client</h1>
+    
+    <!-- Message Input Form -->
+    <form action="{{ url_for('post_message') }}" method="post" class="message-form">
+        <input type="text" name="message" placeholder="Enter your message" class="message-input" required>
+        <button type="submit" class="btn btn-primary">Send Message</button>
     </form>
-    <br>
-    <a href="{{ url_for('read_messages') }}">Read Messages</a>
+
+    <!-- Message Controls -->
+    <div class="button-container">
+        <a href="{{ url_for('index', filter_languages=filter_languages) }}" 
+           class="btn btn-info">Refresh</a>
+        <form action="{{ url_for('clear_messages') }}" method="post" style="margin: 0;">
+            <button type="submit" class="btn btn-warning">Clear Messages</button>
+        </form>
+        <a href="{{ url_for('index', filter_languages='true' if not filter_languages else 'false') }}" 
+           class="btn {% if filter_languages %}btn-success{% else %}btn-secondary{% endif %}">
+            {% if filter_languages %}
+            Show All Languages
+            {% else %}
+            Filter Languages (EN/DE/NL/FR/ES/IT)
+            {% endif %}
+        </a>
+    </div>
+
+    <!-- Messages List -->
+    <h2>Messages</h2>
+    <ul>
+        {% for message in messages %}
+            <li {% if message.is_own %}style="background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin: 5px 0;"{% endif %}>
+                <strong {% if message.is_own %}style="color: #0d47a1;"{% endif %}>
+                    {{ message.pubkey }}:
+                </strong> 
+                {{ message.content | safe }} 
+                <em>(from {{ message.relay }} at 
+                    <span style="color: {% if message.is_own %}#1565c0{% else %}magenta{% endif %};">
+                        {{ message.created_at if message.created_at else 'received at ' + (message.received_at or '') }}
+                    </span>)
+                </em>
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

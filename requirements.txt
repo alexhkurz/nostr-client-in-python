@@ -1,0 +1,9 @@
+nostr
+websockets
+asyncio
+colorama
+flask
+ecdsa
+secp256k1
+langdetect
+pytz

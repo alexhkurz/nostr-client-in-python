@@ -1,12 +1,33 @@
 #!/bin/bash
 
-# Create and activate a new virtual environment
-python3 -m venv venv
+# Exit on error
+set -e
+
+# Choose a specific Python version (adjust as needed)
+PYTHON="python3.12"  # or python3.13
+
+echo "Creating virtual environment with $PYTHON..."
+
+# Check if Python version exists
+if ! command -v $PYTHON &> /dev/null; then
+    echo "Error: $PYTHON not found. Please install it first."
+    exit 1
+fi
+
+# Remove existing venv if it exists
+if [ -d "venv" ]; then
+    echo "Removing existing virtual environment..."
+    rm -rf venv
+fi
+
+# Create and activate virtual environment
+$PYTHON -m venv venv
 source venv/bin/activate
 
-# Upgrade pip and install the required packages
+echo "Installing dependencies..."
+# Upgrade pip
 pip install --upgrade pip
-pip install nostr websockets asyncio colorama
-pip install flask
-pip install ecdsa
-pip install secp256k1
+# Install from requirements.txt
+pip install -r requirements.txt
+
+echo "Setup complete! Virtual environment is activated."
