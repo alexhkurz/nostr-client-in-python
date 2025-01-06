@@ -78,7 +78,9 @@ async def post_message_async(message):
         await client.send_message(message)
 
 async def read_messages_async():
-    client = NostrClient()
+    private_key, public_key = generate_key_pair()
+    save_keys_to_config(private_key, public_key)
+    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = await client.fetch_relays()
     if alive_relays:
         client.relay_url = alive_relays[0]
