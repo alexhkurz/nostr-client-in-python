@@ -50,6 +50,6 @@ python app.py
 > 
 > `connect()` attempts to connect to the relay for sending and receiving messages.
 
-`app.py` that provides a web interface to the Nostr client.
+`app.py` provides a web interface to the Nostr client.
 
 [^dsm]: I am interested in building and studying decentralized social media. Two much discussed decentralized social networks nowadays are Nostr and Bluesky. Nostr is the simplest one and, thus, would be a good start to "get our hands dirty" and gain some experience building. I think I mentioned Nostr before, did you have a chance to look at it?
