@@ -1,6 +1,6 @@
 # Nostr Client in Python
 
-This is a simple Nostr client [^dsm] in Python that connects to a relay and allows you to send and receive events.
+This is a simple Nostr client in Python that connects to a relay and allows you to send and receive events.
 
 WARNING: Work in progress. Simple web interface to send and read messages.
 
@@ -52,4 +52,3 @@ python app.py
 
 `app.py` provides a web interface to the Nostr client.
 
-[^dsm]: I am interested in building and studying decentralized social media. Two much discussed decentralized social networks nowadays are Nostr and Bluesky. Nostr is the simplest one and, thus, would be a good start to "get our hands dirty" and gain some experience building. I think I mentioned Nostr before, did you have a chance to look at it?
