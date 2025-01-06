@@ -11,9 +11,10 @@ import pytz
 import hashlib
 import hmac
 from ecdsa import SigningKey, SECP256k1
+from secp256k1 import PrivateKey
 
 # Define the configuration file name as a constant
-CONFIG_FILE_NAME = 'config2.json'
+CONFIG_FILE_NAME = 'config.json'
 
 class NostrClient:
     def __init__(self, relay_url, private_key, public_key):
@@ -29,13 +30,16 @@ class NostrClient:
         ]
 
     def sign_event(self, event):
-        # Create a deterministic JSON string of the event
-        event_json = json.dumps(event, separators=(',', ':'), sort_keys=True)
-        # Hash the event
-        event_hash = hashlib.sha256(event_json.encode()).hexdigest()
-        # Sign the hash with the private key (using HMAC for demonstration)
-        signature = hmac.new(self.private_key.encode(), event_hash.encode(), hashlib.sha256).hexdigest()
-        return signature
+        # Convert the private key from hex to bytes
+        private_key_bytes = bytes.fromhex(self.private_key)
+        signing_key = PrivateKey(private_key_bytes)
+        
+        # Create the event hash
+        event_hash = bytes.fromhex(event["id"])
+        
+        # Sign using Schnorr
+        sig = signing_key.schnorr_sign(event_hash, None, raw=True)
+        return sig.hex()
 
     async def connect(self):
         try:
@@ -77,24 +81,35 @@ class NostrClient:
             print("Please check if the relay URL is correct and reachable.")
 
     async def send_message(self, message):
+        created_at = int(time.time())
         event = {
-            "id": "",  # Will be calculated
             "pubkey": self.public_key,
-            "created_at": int(time.time()),
-            "kind": 1,  # Assuming '1' is a text note
+            "created_at": created_at,
+            "kind": 1,
             "tags": [],
             "content": message,
             "sig": ""  # Will be calculated
         }
 
-        print(f"Public key in event: {event['pubkey']} (length: {len(event['pubkey'])})")
-        print(f"Event data before sending: {json.dumps(event, indent=2)}")
-        # Calculate the event ID and signature
-        event['id'] = hashlib.sha256(json.dumps(event, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
-        event['sig'] = self.sign_event(event)
+        # Calculate the event ID first (without the sig field)
+        serialized = json.dumps([
+            0,  # Reserved for future use
+            event["pubkey"],
+            event["created_at"],
+            event["kind"],
+            event["tags"],
+            event["content"]
+        ], separators=(',', ':'))
+        
+        event_id = hashlib.sha256(serialized.encode()).hexdigest()
+        event["id"] = event_id
+        event["sig"] = self.sign_event(event)
 
         # Prepare the message according to NIP-01
         message_array = ["EVENT", event]
+
+        print(f"Public key in event: {event['pubkey']} (length: {len(event['pubkey'])})")
+        print(f"Event data before sending: {json.dumps(event, indent=2)}")
 
         try:
             async with websockets.connect(self.relay_url) as websocket:
@@ -149,6 +164,14 @@ class NostrClient:
                 for message in messages:
                     f.write(f"{message['pubkey']}: {message['content']} (created_at: {message['created_at']})\n")
 
+            print("\nMessages:")
+            for msg in messages:
+                is_my_message = msg['pubkey'] == self.public_key
+                prefix = "🟢 (YOU)" if is_my_message else "-"
+                print(f"{prefix} {msg['content']}")
+                print(f"   From: {msg['pubkey'][:8]}...{msg['pubkey'][-8:]}")
+                print(f"   Time: {unix_to_pst(msg['created_at'])}\n")
+
             return messages
 
     async def check_relay(self, relay):
@@ -189,50 +212,59 @@ def unix_to_pst(unix_time):
     return pst_time.strftime('%Y-%m-%d %H:%M:%S %Z')
 
 async def main():
-    # Load keys from config.json
-    with open(CONFIG_FILE_NAME, 'r') as config_file:
-        config = json.load(config_file)
-    
-    private_key = config['private_key']
-    public_key = config['public_key']
+    try:
+        # Load keys from config.json
+        with open(CONFIG_FILE_NAME, 'r') as config_file:
+            config = json.load(config_file)
+        
+        private_key = config['private_key']
+        public_key = config['public_key']
 
-    print(f"Loaded public key: {public_key} (length: {len(public_key)})")
-    if len(public_key) != 66:
-        print("Warning: Public key length is not 66 characters. Please check the key format.")
-    client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
-    print("Checking relays...")
-    alive_relays = await client.fetch_relays()
-    print(f"\nSummary:")
-    print(f"Total relays checked: {len(client.potential_relays)}")
-    print(f"Alive relays: {len(alive_relays)}")
-    print(f"Dead relays: {len(client.potential_relays) - len(alive_relays)}")
-    
-    if alive_relays:
-        client.relay_url = alive_relays[0]  # Update the relay_url to the first alive relay
-        print(f"Connected to relay: {client.relay_url}")  # Output the current relay URL
-    else:
-        print("No alive relays found. Exiting.")
-        return
-
-    while True:
-        print("\nOptions:")
-        print("1. Post a message")
-        print("2. Read messages")
-        print("3. Exit")
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            message = input("Enter your message: ")
-            await client.send_message(message)
-        elif choice == "2":
-            messages = await client.read_messages()
-            print("\nMessages:")
-            for msg in messages:
-                print(f"- {msg}")
-        elif choice == "3":
-            break
+        print(f"Loaded public key: {public_key} (length: {len(public_key)})")
+        if len(public_key) != 66:
+            print("Warning: Public key length is not 66 characters. Please check the key format.")
+        client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
+        print("Checking relays...")
+        alive_relays = await client.fetch_relays()
+        print(f"\nSummary:")
+        print(f"Total relays checked: {len(client.potential_relays)}")
+        print(f"Alive relays: {len(alive_relays)}")
+        print(f"Dead relays: {len(client.potential_relays) - len(alive_relays)}")
+        
+        if alive_relays:
+            client.relay_url = alive_relays[0]  # Update the relay_url to the first alive relay
+            print(f"Connected to relay: {client.relay_url}")  # Output the current relay URL
         else:
-            print("Invalid choice. Please try again.")
+            print("No alive relays found. Exiting.")
+            return
+
+        while True:
+            try:
+                print("\nOptions:")
+                print("1. Post a message")
+                print("2. Read messages")
+                print("3. Exit")
+                choice = input("Enter your choice: ")
+
+                if choice == "1":
+                    message = input("Enter your message: ")
+                    await client.send_message(message)
+                elif choice == "2":
+                    messages = await client.read_messages()
+                    print("\nMessages:")
+                    for msg in messages:
+                        print(f"- {msg}")
+                elif choice == "3":
+                    break
+                else:
+                    print("Invalid choice. Please try again.")
+            except (EOFError, KeyboardInterrupt):
+                print("\nGoodbye!")
+                break
+    except Exception as e:
+        print(f"\nAn error occurred: {e}")
+    finally:
+        print("\nClosing Nostr client...")
 
 if __name__ == "__main__":
     asyncio.run(main())
