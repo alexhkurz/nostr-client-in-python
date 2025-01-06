@@ -19,8 +19,14 @@ def post_message():
 
 @app.route('/read_messages')
 def read_messages():
-    private_key, public_key = generate_key_pair()
-    save_keys_to_config(private_key, public_key)
+    try:
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
+            private_key = config['private_key']
+            public_key = config['public_key']
+    except FileNotFoundError:
+        private_key, public_key = generate_key_pair()
+        save_keys_to_config(private_key, public_key)
     client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = asyncio.run(client.fetch_relays())
     if alive_relays:
@@ -44,8 +50,14 @@ def read_messages():
     except FileNotFoundError:
         pass
 
-    private_key, public_key = generate_key_pair()
-    save_keys_to_config(private_key, public_key)
+    try:
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
+            private_key = config['private_key']
+            public_key = config['public_key']
+    except FileNotFoundError:
+        private_key, public_key = generate_key_pair()
+        save_keys_to_config(private_key, public_key)
     client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = asyncio.run(client.fetch_relays())
     if alive_relays:
@@ -69,8 +81,14 @@ def convert_urls_to_links(text):
     return url_pattern.sub(r'<a href="\1" target="_blank">\1</a>', text)
 
 async def post_message_async(message):
-    private_key, public_key = generate_key_pair()
-    save_keys_to_config(private_key, public_key)
+    try:
+        with open('config.json', 'r') as config_file:
+            config = json.load(config_file)
+            private_key = config['private_key']
+            public_key = config['public_key']
+    except FileNotFoundError:
+        private_key, public_key = generate_key_pair()
+        save_keys_to_config(private_key, public_key)
     client = NostrClient(relay_url=None, private_key=private_key, public_key=public_key)
     alive_relays = await client.fetch_relays()
     if alive_relays:
