@@ -108,7 +108,7 @@ async def read_messages_async():
     return []
 
 if __name__ == '__main__':
-    port = 5000  # You can change this if needed
+    port = 5001  # Changed port to 5001
     click.echo(f"\nServer starting. Click the link below to open the app:")
     click.echo(click.style(f"http://127.0.0.1:{port}", underline=True, fg="cyan"))
     app.run(debug=True, port=port)
