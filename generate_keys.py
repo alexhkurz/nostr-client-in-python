@@ -1,5 +1,5 @@
 # generate_keys.py
-# https://github.com/nostr-protocol/nips/blob/master/01.md
+# 
 import json
 from ecdsa import SigningKey, SECP256k1
 
@@ -7,11 +7,13 @@ def generate_key_pair():
     private_key = SigningKey.generate(curve=SECP256k1)
     public_key = private_key.get_verifying_key()
 
-    private_key_hex = private_key.to_string().hex()
-    # Get the uncompressed form of the public key and convert to 64-character hex
-    public_key_hex = public_key.to_string().hex()[:64]
+    private_key = private_key.to_string().hex()
+    public_key = public_key.to_string("compressed").hex()  # Use compressed format
 
-    return private_key_hex, public_key_hex
+    print(private_key); print(len(private_key))
+    print(public_key); print(len(public_key))
+
+    return private_key, public_key
 
 def save_keys_to_config(private_key, public_key, filename='config.json'):
     config = {
