@@ -2,7 +2,9 @@
 
 This is a simple Nostr client in Python that connects to a relay and allows you to send and receive events.
 
-WARNING: Work in progress. Simple web interface to send and read messages.
+WARNING: Work in progress. Intended as a teaching and learning project, not for production use or deployment.
+
+![alt text](img/image.png)
 
 ## Installation, Setup, Usage
 
